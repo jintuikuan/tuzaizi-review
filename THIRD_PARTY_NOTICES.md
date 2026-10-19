@@ -1,6 +1,6 @@
 # Third-party methods and notices
 
-`gene-research-review` is an original implementation. Its workflow design was informed by the repositories below. No upstream program code is bundled or copied. These notices retain the verified source attribution and license texts for the referenced workflow materials; they do not relicense retrieved publications or imply endorsement.
+`tuzaizi-review` is an original implementation. Its workflow design was informed by the repositories below. No upstream program code is bundled or copied. These notices retain the verified source attribution and license texts for the referenced workflow materials; they do not relicense retrieved publications or imply endorsement.
 
 ## aipoch/medical-research-skills
 

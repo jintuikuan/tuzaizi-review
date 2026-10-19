@@ -5,7 +5,7 @@
 ## 命令与时间规则
 
 ```bash
-SKILL=/actual/path/to/gene-research-review
+SKILL=/actual/path/to/tuzaizi-review
 RUN=/actual/path/to/project/work/mettl3-immune-review
 
 python3 "$SKILL/scripts/research.py" init --run-dir "$RUN" \

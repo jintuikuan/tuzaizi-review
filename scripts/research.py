@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Command-line plumbing for the gene-research-review Codex skill.
+"""Command-line plumbing for the tuzaizi-review Codex skill.
 
 The agent reads evidence and writes structured analyses; these commands perform
 reproducible retrieval, checkpoint validation and artifact export.

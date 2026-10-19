@@ -1,5 +1,5 @@
 ---
-name: gene-research-review
+name: tuzaizi-review
 description: Investigate a gene within a publication date window and disease or mechanism context, map literature and evidence-grounded research gaps, then write a verified narrative review after the user selects a focus. Use for gene-centered literature landscapes, innovation discovery, and review writing.
 ---
 

@@ -1,20 +1,20 @@
-# gene-research-review
+# tuzaizi-review
 
 面向 Codex 的基因调研与综述总控技能。输入“基因 + 时间窗 + 疾病或机制”，依次执行真实文献检索、证据全景整理、创新点反查，等用户选择方向后撰写并核验综述。
 
 ## 安装与调用
 
-将本仓库的完整目录安装到 `~/.codex/Skills/gene-research-review/`，确保该目录下直接包含 `SKILL.md`：
+将本仓库的完整目录安装到 `~/.codex/Skills/tuzaizi-review/`，确保该目录下直接包含 `SKILL.md`：
 
 ```bash
-git clone git@github.com:jintuikuan/gene-research-review.git \
-  "$HOME/.codex/Skills/gene-research-review"
+git clone git@github.com:jintuikuan/tuzaizi-review.git \
+  "$HOME/.codex/Skills/tuzaizi-review"
 ```
 
 在能发现该技能的新 Codex 对话中输入：
 
 ```text
-$gene-research-review 帮我调研近5年 METTL3 在肿瘤免疫逃逸中的研究，梳理方向并提出有证据支持的创新点。
+$tuzaizi-review 帮我调研近5年 METTL3 在肿瘤免疫逃逸中的研究，梳理方向并提出有证据支持的创新点。
 ```
 
 默认先交付中文研究全景和创新点说明，进入 `awaiting_selection` 后**必须停止并等待用户选题**。收到“继续，选第 2 个方向”等明确选择后，才撰写 4,000–6,000 词的英文机制导向叙述性综述，导出 Markdown、可编辑 Word、参考文献和证据表。
@@ -31,7 +31,7 @@ $gene-research-review 帮我调研近5年 METTL3 在肿瘤免疫逃逸中的研�
 实际 CLI 示例：
 
 ```bash
-SKILL="$HOME/.codex/Skills/gene-research-review"
+SKILL="$HOME/.codex/Skills/tuzaizi-review"
 RUN="$PWD/work/mettl3-immune-review"
 
 python3 "$SKILL/scripts/research.py" init --run-dir "$RUN" \

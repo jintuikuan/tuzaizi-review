@@ -62,7 +62,7 @@ class Client:
     def _get(self, url, params=None):
         params = dict(params or {})
         if parse.urlsplit(url).hostname == "eutils.ncbi.nlm.nih.gov":
-            params.setdefault("tool", "gene-research-review")
+            params.setdefault("tool", "tuzaizi-review")
             if os.environ.get("NCBI_EMAIL"):
                 params.setdefault("email", os.environ["NCBI_EMAIL"])
             if os.environ.get("NCBI_API_KEY"):
@@ -80,7 +80,7 @@ class Client:
                 time.sleep(delay)
             try:
                 self._last_request[host] = time.monotonic()
-                req = request.Request(url, headers={"User-Agent": "gene-research-review/1.0 (research literature retrieval)",
+                req = request.Request(url, headers={"User-Agent": "tuzaizi-review/1.0 (research literature retrieval)",
                                                     "Accept": "application/json, application/xml, text/plain"})
                 with request.urlopen(req, timeout=self.timeout) as response:
                     text = response.read().decode(response.headers.get_content_charset() or "utf-8")
