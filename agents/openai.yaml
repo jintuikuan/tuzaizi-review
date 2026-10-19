@@ -1,0 +1,6 @@
+interface:
+  display_name: "基因研究全景与综述"
+  short_description: "Map gene literature, research gaps, and verified reviews"
+  default_prompt: "使用 $gene-research-review 调研近 5 年 METTL3 在肿瘤免疫逃逸中的研究，先给出研究方向与有证据支持的创新点，等我选定后撰写英文综述。"
+policy:
+  allow_implicit_invocation: true

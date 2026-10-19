@@ -1,0 +1,24 @@
+# Python runtimes and caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+.cache/
+
+# Local research runs and generated deliverables
+/work/
+/runs/
+/outputs/
+fulltext/
+*.response
+*.docx
+*.pdf
+
+# Local settings and credentials
+.DS_Store
+.env
+.env.*
+!.env.example
