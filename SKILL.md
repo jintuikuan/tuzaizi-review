@@ -1,60 +1,54 @@
 ---
 name: tuzaizi-review
-description: Investigate a gene within a publication date window and disease or mechanism context, map literature and evidence-grounded research gaps, then write a verified narrative review after the user selects a focus. Use for gene-centered literature landscapes, innovation discovery, and review writing.
+description: Orchestrate bundled AIpoch skills for gene-centered literature searches, evidence landscapes and research gaps, pause for the user's direction selection, then invoke K-Dense literature-review to write and verify a narrative review. Use for gene + date window + disease or mechanism research and selected-topic review continuation.
 ---
 
-# 基因研究全景、创新点与综述
+# 基因调研与综述总控
 
-把“基因 + 时间范围 + 疾病/机制”的一句话需求，转成可追溯的真实检索、研究方向、创新点候选和专题综述。脚本承担检索与校验；由当前代理阅读证据、判断研究空白并写作。默认先交付中文方向报告与创新点候选，**等用户选定主线后**，再写 4,000–6,000 英文正文词的 narrative review，交付 Markdown 与 Word。
+由本技能调度两套上游的真实子技能：选题前执行 AIpoch 检索策略、证据全景和创新点工作流，交付中文候选方向并暂停；收到用户选择后，执行 K-Dense `literature-review` 撰写英文机制导向叙述性综述（默认正文 4,000–6,000 词），再执行 AIpoch 论断核验，交付 Markdown、Word、文献库和证据表。
 
-这不是定时任务，也不默认安装其他技能库、使用付费 API 或声称完成系统综述。现有授权足以开始只读文献检索，不另设检索审批。
+## 调度约定
 
-## 入口与工作目录
+- 将实际技能目录记为 `SKILL`，独立研究目录记为 `RUN`。先读[上游调度契约](references/upstream-routing.md)；输入输出和数据格式见[文件契约](references/workflow-contract.md)，证据与评分见[证据标准](references/evidence-rubrics.md)。
+- 必用子技能及原始资源已随本技能放在 `upstream/`，锁定提交与逐文件 SHA256 见 `upstream/manifest.json`。不依赖另行安装整个上游仓库。资源缺失或校验失败要报告并修复，不能悄悄退回“仅参考上游”的独立模式。
+- 各阶段先运行 `research.py skills begin`，读取它返回的真实上游 `SKILL.md`，并按原文加载需要的 `references/`。代理实际遵循规程完成任务后写执行说明，再运行 `skills finish`。`plan`、下载、展示原文或 `loaded` 日志本身都不算完成调用。
+- Python 命令负责可靠的数据获取、核验和断点；科学分析与写作由执行上游技能的代理完成。它们不是后台运行的另一个模型。不要伪造完成报告或将回执视为科学正确性的证明。
+- `research.py --help` 及各子命令的 `--help` 是参数接口。允许通常的自动技能发现。
 
-- 将本技能实际目录记为 `SKILL`；不要硬编码作者机器的绝对路径。脚本入口为 `python3 "$SKILL/scripts/research.py"`。
-- 每个研究建立独立运行目录 `RUN`。依宿主约定选择用户项目下的工作目录；阶段最终交付物放用户指定的输出目录。已有运行优先 `status`，不要重建覆盖。
-- 先读 [执行与文件契约](references/workflow-contract.md)；开始归纳证据和评分时读 [证据标准与评分](references/evidence-rubrics.md)。只有复用上游资源或解释来源时才读 [来源与可选复用](references/sources-and-reuse.md)。
-- `research.py --help` 以及各子命令的 `--help` 是可执行参数的权威接口。核心检索使用 Python 标准库与公开 API；导出 Word 另需可用的 `python-docx`。
+## 1. 解析并调用检索策略技能
 
-## 1. 解析需求并真实检索
+1. 解析基因、疾病/机制、日期。缺省人类基因名称，但保留动物模型文献。NCBI Gene 优先、Ensembl 后备；无法消除的基因歧义才询问。
+2. “近五年”按运行日滚动回溯；明确 `2021–2026` 是 2021-01-01 至运行日与 2026-12-31 中较早者，不称为精确五年。概念组内 OR、组间 AND，不把整段中文提示作查询。
+3. `init` 建立带编排约定的新运行，然后 `skills begin --phase search`，实际执行 AIpoch `biomedical-search-strategy-builder`；检查概念、MeSH、别名和日期，并写 `search_strategy.md`。不确定的 MeSH 用自由词并说明。
+4. 如上游策略优化了查询，用 `set-queries` 保存最终的 PubMed/Europe PMC 精确检索式。完成 search 回执后执行 `search --enrich-preprints`，核对分页、命中数和错误。`--limit` 只做连通性测试，不能进入正式选题。
+5. 去重并关联预印本与正式报告；对关键证据运行 `fulltext`，仅合法开放全文。区分题录、摘要、全文及阅读深度，不补造正文细节。
 
-1. 提取基因、疾病/机制、时间窗。缺省为检索当日向前滚动 5 年；用户明确日期优先。`2021–2026` 是 6 个年份标签，按 2021-01-01 至检索当日或 2026-12-31 中较早者，不称为精确滚动 5 年。绝不包含未来日期。
-2. 默认用人类 NCBI Gene 解析官方 Symbol 与现行别名；NCBI 无结果或不可用时使用受唯一基因及 EntrezGene 关联检查约束的 Ensembl 后备，并记录别名覆盖限制。**人类基因解析不等于只纳入人类实验**。保留相关动物模型。遇到多个合理基因或物种且无法从语境判定时才询问。
-3. 将疾病/机制科学地展开为同义概念组：组内 OR，组间 AND。不要把整段中文提示、研究目标或“创新点”等词直接当检索式。使用可解释的基因别名并检查普通词/短别名造成的误检；不承诺获得“全部历史别名”。
-4. 执行 `init`、`search --enrich-preprints`，检查实际查询、日期、分页数、错误与完成标记。初始例子见参考文件。`--limit` 仅用于连通性 smoke test；受限检索不能支持完整性、新颖性结论或最终综述。
-5. 按研究问题筛选，区分原始研究、综述和预印本；保留原始题录与出处。去重按 DOI、PMID、规范化标题，并核对疑似同题记录，关联预印本与正式版。正式版优先引用；同一研究不能重复计为独立证据。
-6. 对关键机制、矛盾与创新点依赖的论文执行 `fulltext`，优先合法开放全文。无法获得全文时保留摘要证据深度，降低论断粒度，不补造样本量、实验细节或原文位置。
+## 2. 调用全景与创新点技能
 
-## 2. 形成研究方向与证据矩阵
+1. `skills begin --phase landscape`：执行 `disease-mechanism-evidence-map` 与 `biomarker-landscape-scanner` 的适用模式。逐篇提取 `evidence.jsonl`，按机制、通路、癌种、细胞、物种和实验层级写 `landscape.md`。生物标志物用途不适用时记录适用性判断，不把机制证据包装为临床成熟度。
+2. `skills begin --phase gaps`：执行 `medical-research-gap-finder`、`medical-topic-saturation-and-whitespace-checker`、`contradictory-findings-resolver` 和 `method-gap-detector`。依据真实语料识别饱和、矛盾和方法缺口，排除伪空白；条件不适用也须说明判断依据。
+3. 每个候选用 `gap-search` 做针对性反证，必要时向时间窗之前追溯，标作 `gap_verification`。写 `gaps.json` / `gaps.md`：支持证据、最近邻、缺失证据、验证思路、新颖度/可行性 1–5 分及资源假设、置信度、反查范围。正式可选方向只纳入 medium/high confidence；低置信线索另列。
+4. 通常归纳 3–5 个方向，证据不足则减少。无可靠候选时交付不可判定结果并等待重定范围；不凑数，不把未检到写成“全球首次”。排除含模拟数据的新颖度评分器。
+5. 每阶段实际完成后记录 `skills finish`。执行记录保留所用技能版本、应用说明和产物摘要；仍须通过本技能独立的证据、分页与反查门槛。
 
-逐篇阅读后由代理写 `evidence.jsonl`，每条发现绑定真实 `paper_id`、原文短引与位置。按上/下游机制、通路、癌种、细胞类型、物种和实验层级归纳方向，生成 `landscape.md`。区分关联与干预证据，区分推测、体外、动物和临床证据。
+## 3. 保存断点，必须等用户选题
 
-通常归纳 3–5 个方向，但证据不足时可以更少；不要为了凑数拆分同一机制。数量应按独立研究计算，不把多篇综述重复引用同一实验当作多个验证。图表和主题聚类必须能回指证据记录，不用虚构聚类算法或没有运行过的分析。
+运行 `verify` 和 `checkpoint`；前述三个上游阶段缺回执、资源损坏、受限/失败检索或证据不完整时，不得通过。成功后状态为 `awaiting_selection`。
 
-## 3. 提出并反查创新点
+向用户展示候选编号与中文报告，要求选择，随后结束本轮。**选题前不得开始 review / claims 写作阶段，不代选，不生成完整综述。** 上游“推荐一个最佳方向”只能作为建议，不能转为用户选择。
 
-1. 从已有研究的具体限制、同条件下的矛盾、未验证机制、未覆盖细胞群或转化断层提出候选。
-2. 对每个候选执行 `gap-search`：使用候选问题的独立同义词与最近邻研究线索，主动寻找已经解决它的论文。可向时间窗之前延伸；旧文献属于 `corpus_role=gap_verification`，与核心的 `corpus_role=core` 分开标记，不悄悄计入近年核心研究数量。
-3. 写 `gaps.json` 与中文 `gaps.md`：研究问题、已有证据、最近邻研究、缺失的证据、可执行验证思路、新颖度/可行性 1–5 分及依据、资源假设、置信度和反查结果。每个分数都是可解释的相对判断，不是经验证量表或概率。
-4. 明确“本次查询未发现”的范围；不能由未检到推导“全球首次”。如已有论文解决候选问题，撤下或重构候选；检索不完整时不得给出确定的新颖性结论。
+## 4. 用户选择后调用综述技能
 
-## 4. 必须等待用户选择
+1. 收到“继续，选第 2 个方向”等真实指令后，先 `status` 恢复同一 `RUN`，再 `select --gap G2 --user-selection '用户本次原话'`。不重跑无关检索；更换基因或日期则新建运行。
+2. `skills begin --phase review` 现在才可启动；实际读取、执行 K-Dense `literature-review` 及其 `references/core_workflow.md`、`references/search_and_citation.md` 等所需资源。传入已选问题、既有语料、检索日志和证据表；只补检选中方向。
+3. 按上游的范围界定、筛选、质量评价和主题综合规程写 `manuscript.md` 与 `claims.jsonl`。围绕所选主线组织背景、主要机制、矛盾与空白、研究议程和转化展望；避免逐篇罗列。默认英文正文 4,000–6,000 词，方法中写真实检索范围。已有发现、模型推断和待验证假设分开。
+4. 保留稳定引文 `[@paper_id]`。完成 review 回执，再 `skills begin --phase claims`，实际执行 AIpoch `paper-to-claim-verifier`，逐条审阅主张、证据层级、原文位置和支持程度，写 `claim_verification.md`。需要修改稿件时重新完成 review 与 claims，保持回执对应最终内容。
+5. `verify` 另核对 DOI/PMID、题录、撤稿/更正；无法核验记未核验。DOI 可解析不等于主张成立。修正 partial/unsupported/unassessable 的核心事实论断。
+6. `validate --final` 通过后 `export`：由同一主稿生成 `review.md`、`review.docx`、证据 CSV 和 BibTeX。Word 另需 `python-docx`；可发现宿主已有文档运行环境。最终交付含真实上游阶段执行记录，不自动声称稿件已满足投稿标准。
 
-完成阶段报告后运行 `verify`（默认核验分析实际使用的文献）和 `checkpoint`，使运行进入 `awaiting_selection`。核心检索须完整分页且不限量；失败或限量测试不能通过该门槛，完整重跑可覆盖旧失败。向用户展示候选表与可点击报告，要求选择一个编号，也允许用户重定方向。**在收到用户明确选择前结束本轮工作；不代选、不虚构用户回复、不生成完整综述。**
+## 边界与恢复
 
-用户后续选择后，运行 `select --gap G2 --user-selection '用户本次选择的原话'`。该参数必须记录真实用户指令。恢复时先 `status`，读取已有资料，复用已完成检索；只有范围变化或需补证据时才重新检索。改换基因/时间窗建立新运行。
-
-## 5. 围绕选定主线成文并核验
-
-- 根据选定问题定叙事主线，必要时补检。默认英文正文 4,000–6,000 词，包含标题、摘要、基因背景、近年主要机制、矛盾与关键证据缺口、未来验证及转化方向；按内容调整章节，不机械罗列论文。正文包含简要检索方法、范围与日期。
-- 写 `manuscript.md` 与 `claims.jsonl`。规范引文是 `[@paper_id]`，如 `[@P0123456789ab]`；不要手工编参考文献身份或编号。实质性论断逐条映射证据；假设与未来设想明确为作者综合判断。
-- `verify` 核验 DOI/PMID 身份与题录匹配、已知撤稿/更正；代理另行审阅论断是否得到所引来源支持。元数据核验不等于科学论断已获支持。修订 partial/unsupported/unassessable 的事实性核心论断。
-- 运行 `validate --final`；通过后 `export`，由同一 Markdown 主稿生成编号引文、参考文献和 Word。Word 缺依赖时，在 Codex 使用工作区依赖发现工具寻找已有 `python-docx`；其他宿主检测现有 Python 环境，不硬编码路径、不静默跳过 Word、不自动安装整个上游仓库。
-- 最终交付 `review.md`、`review.docx`、阶段报告和 `reference_audit.json`，可附证据表及 BibTeX；说明实际覆盖范围、全文可得性及未解决的核验问题。仅在必要检查通过且交付物齐备后标为 `complete`。
-
-## 故障与真实性约束
-
-- API 失败、限流、分页中断、零结果均须记录。使用脚本重试/恢复功能；不得用示例、缓存样例或模型记忆伪装实时检索。
-- PubMed 与 Europe PMC 有大量重叠；Europe PMC 发现的预印本加 bioRxiv DOI 接口补全，不等于独立、穷尽检索了所有 bioRxiv 内容。
-- 无足够证据时交付较少方向、探索性问题或明确的不可判定结果；不捏造 3–5 个“真实创新点”。不把代理生成的实验设计写成已发表发现。
-- 上游技能是可选资源；先确认本地实际存在且资源可执行，再复用。付费服务、未配置连接器和整个仓库安装都不是默认依赖。
+- 上游原文未修改；本任务的语言、选题暂停、免费检索和 Markdown/Word 交付优先，具体适配和来源覆盖限制须按[调度契约](references/upstream-routing.md)记录。
+- 不默认启用 Parallel/OpenRouter 等付费服务或大规模安装；不把示例、评测数据当研究结果。缺 Google Scholar / Web of Science 就记录未检索，不声称穷尽覆盖。
+- 已有旧版运行不会自动追认上游执行。选题前可用 `skills enable` 迁移，再实际执行三个前置阶段；已选题/完成的旧运行新建编排运行并复用语料，不能补造旧调用记录。
+- 确认过的上游版本与许可见[来源与复用](references/sources-and-reuse.md)及 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。

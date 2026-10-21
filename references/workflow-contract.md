@@ -1,6 +1,6 @@
 # 执行与文件契约
 
-以下命令中的 `SKILL` 为安装目录，`RUN` 为一次研究的独立目录。命令不调用另一个 LLM；当前代理负责证据阅读与内容生成。
+以下命令中的 `SKILL` 为安装目录，`RUN` 为一次研究的独立目录。总控按[上游调度契约](upstream-routing.md)加载并执行实际子技能。命令本身不启动另一个 LLM；当前代理或子代理遵循被调度技能完成证据分析与成文。新建运行自动启用编排门槛。
 
 ## 命令与时间规则
 
@@ -12,6 +12,11 @@ python3 "$SKILL/scripts/research.py" init --run-dir "$RUN" \
   --gene METTL3 --topic 'tumor immune escape' --years 2021:2026 \
   --concept 'immune escape|immune evasion|immunosuppression|checkpoint|PD-L1' \
   --concept 'cancer|tumor|tumour|neoplasm'
+# init 后先执行上游检索策略，再检索：
+python3 "$SKILL/scripts/research.py" skills begin --run-dir "$RUN" --phase search
+# 代理遵循原文、写 search_strategy.md 与完成报告，必要时 set-queries：
+# set-queries --run-dir "$RUN" --pubmed-query '实际策略' --europepmc-query '实际策略'
+# skills finish --run-dir "$RUN" --invocation ACTUAL_ID --report "$RUN/search_execution.json"
 python3 "$SKILL/scripts/research.py" search --run-dir "$RUN" --enrich-preprints
 python3 "$SKILL/scripts/research.py" status --run-dir "$RUN"
 ```
@@ -43,6 +48,7 @@ python3 "$SKILL/scripts/research.py" gap-search --run-dir "$RUN" --gap-id G1 \
 
 ```bash
 python3 "$SKILL/scripts/research.py" verify --run-dir "$RUN"
+# landscape 与 gaps 阶段均须实际 begin → 执行上游 → finish。
 python3 "$SKILL/scripts/research.py" checkpoint --run-dir "$RUN"
 # 此处结束本轮，展示报告并等待用户；不得直接执行下一行。
 
@@ -52,6 +58,8 @@ python3 "$SKILL/scripts/research.py" select --run-dir "$RUN" \
 
 # 代理完成 manuscript.md 和 claims.jsonl 后：
 python3 "$SKILL/scripts/research.py" verify --run-dir "$RUN"
+# select 后才允许 review / claims；每阶段实际执行并 finish。
+# review 加载 K-Dense literature-review，claims 加载 AIpoch paper-to-claim-verifier。
 python3 "$SKILL/scripts/research.py" validate --run-dir "$RUN" --final
 python3 "$SKILL/scripts/research.py" export --run-dir "$RUN"
 ```
@@ -137,3 +145,9 @@ python3 "$SKILL/scripts/research.py" export --run-dir "$RUN"
 - `awaiting_selection` 时只交阶段报告；恢复后用真实用户选择继续，不能绕过选择门槛。
 - 正文默认 4,000–6,000 英文词，引用必须存在于规范语料且可回指相应证据。显式测试可在 `init` 使用 `--word-min N --word-max M` 缩短词数，不改变真实运行默认要求。
 - Markdown 与 Word 来自同一主稿，参考文献身份和编号一致。检查 Word 能打开、正文与参考文献齐全；不把只生成 Markdown 当作双格式完成。
+
+## 编排文件
+
+`upstream/manifest.json` 锁定必用技能与逐文件摘要；运行目录的 `orchestration_events.jsonl` 区分 loaded/completed、记录代理应用说明与产物摘要。执行报告格式及全部命令见[上游调度契约](upstream-routing.md)。
+
+新 `init` 的 `run.json` 含 `orchestration.version=1`。没有该字段的旧运行保持格式兼容；仅选题前可 `skills enable` 迁移。新版本不把旧自写分析追认为上游执行。

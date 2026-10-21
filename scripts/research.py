@@ -23,6 +23,8 @@ from retrieval import (Client, RetrievalError, resolve_gene, build_queries,
 from verification import verify_reference
 from workflow import (create_run, load_run, update_run, load_jsonl, write_jsonl,
                       prepare_selection, select_gap, validate_run, export_review)
+from orchestration import (enable as enable_skills, phase_plan, begin_phase,
+                           finish_phase, completed_phase_errors)
 
 
 def today():
@@ -135,8 +137,32 @@ def init_command(args):
                    "allow_background_refs": bool(args.allow_background_refs)})
     state = create_run(run_dir, params, gene)
     queries = build_queries(gene, concepts, params["start"], params["end"])
-    state = update_run(run_dir, query_plan=queries)
+    # Keep a new run guarded even if bundle validation fails partway through init.
+    state = update_run(run_dir, query_plan=queries, orchestration={"version": 1})
+    state = enable_skills(run_dir)
     return {"run_dir": str(run_dir), "status": state["status"], "gene": gene, "parameters": params, "queries": queries}
+
+
+def set_queries_command(args):
+    state = load_run(args.run_dir)
+    if state["status"] != "initialized":
+        raise ValueError("Set the upstream search strategy before retrieval; changed scope needs a new run")
+    queries = {"pubmed": args.pubmed_query.strip(), "europepmc": args.europepmc_query.strip()}
+    if any(not query for query in queries.values()):
+        raise ValueError("Both exact database queries must be nonempty")
+    return update_run(args.run_dir, query_plan=queries)
+
+
+def skills_command(args):
+    if args.action == "enable":
+        return enable_skills(args.run_dir)
+    if args.action == "finish":
+        if not args.invocation or not args.report:
+            raise ValueError("skills finish requires --invocation and --report")
+        return finish_phase(args.run_dir, args.invocation, args.report)
+    if not args.phase:
+        raise ValueError("skills plan/begin requires --phase")
+    return (phase_plan if args.action == "plan" else begin_phase)(args.run_dir, args.phase)
 
 
 def search_command(args):
@@ -145,6 +171,9 @@ def search_command(args):
         raise ValueError("Initial search cannot replace an analysis/selection. Use a new run for changed scope, or gap-search for a supplement.")
     if args.limit is not None and args.limit < 1:
         raise ValueError("--limit must be positive; omitted means all paginated matches")
+    prerequisites = completed_phase_errors(args.run_dir, "search")
+    if prerequisites:
+        raise ValueError("Complete the upstream search strategy before retrieval: " + "; ".join(prerequisites))
     p = state["parameters"]
     result = _do_search(args.run_dir, state["query_plan"], p["start"], p["end"], limit=args.limit, refresh=args.refresh)
     if args.enrich_preprints:
@@ -287,6 +316,18 @@ def parser():
     init.add_argument("--allow-background-refs", action="store_true", help="Only when user authorizes older review background references")
     init.add_argument("--refresh", action="store_true")
     init.set_defaults(handler=init_command)
+    queries = sub.add_parser("set-queries", help="Use exact queries produced by the upstream search skill")
+    queries.add_argument("--run-dir", required=True)
+    queries.add_argument("--pubmed-query", required=True)
+    queries.add_argument("--europepmc-query", required=True)
+    queries.set_defaults(handler=set_queries_command)
+    skills = sub.add_parser("skills", help="Dispatch pinned upstream skills and record actual agent work")
+    skills.add_argument("action", choices=("enable", "plan", "begin", "finish"))
+    skills.add_argument("--run-dir", required=True)
+    skills.add_argument("--phase", choices=("search", "landscape", "gaps", "review", "claims"))
+    skills.add_argument("--invocation")
+    skills.add_argument("--report", help="Agent-written completion report JSON; loading alone is not completion")
+    skills.set_defaults(handler=skills_command)
     for name in ("search", "gap-search", "fulltext", "status", "checkpoint", "select", "verify", "validate", "export"):
         c = sub.add_parser(name)
         c.add_argument("--run-dir", required=True)

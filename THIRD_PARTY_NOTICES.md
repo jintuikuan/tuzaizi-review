@@ -1,6 +1,6 @@
 # Third-party methods and notices
 
-`tuzaizi-review` is an original implementation. Its workflow design was informed by the repositories below. No upstream program code is bundled or copied. These notices retain the verified source attribution and license texts for the referenced workflow materials; they do not relicense retrieved publications or imply endorsement.
+`tuzaizi-review` combines original retrieval/state/export code with the unmodified upstream skill instructions and supporting resources bundled under `upstream/`. The orchestrator loads and applies these skills by phase. Exact source paths, pinned revisions, and file hashes are in `upstream/manifest.json`. Upstream evaluation reports are omitted. The original MIT licenses are also retained beside each bundled source. These notices do not relicense retrieved publications or imply endorsement.
 
 ## aipoch/medical-research-skills
 

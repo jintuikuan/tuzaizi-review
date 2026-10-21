@@ -1,0 +1,177 @@
+{
+  "schema_version": 1,
+  "skills": [
+    {
+      "id": "aipoch/biomarker-landscape-scanner",
+      "entrypoint": "upstream/aipoch/biomarker-landscape-scanner/SKILL.md",
+      "repo": "aipoch/medical-research-skills",
+      "commit": "686e09dfdb45d9fa1a08664f06bb93769b3c9d91",
+      "source_path": "awesome-med-research-skills/Evidence Insight/biomarker-landscape-scanner",
+      "license": "MIT",
+      "files": {
+        "upstream/aipoch/biomarker-landscape-scanner/SKILL.md": "534b77123f8690c2e20ffb56c556225afe63cb63fc9721f2ec70c33ca414d1ec",
+        "upstream/aipoch/biomarker-landscape-scanner/references/biomarker-maturity-framework.md": "244701d36b6be513d499065cc5a3191b7883091b3f9ef6023338a1708b2eaf34",
+        "upstream/aipoch/biomarker-landscape-scanner/references/biomarker-type-taxonomy.md": "a56fc777cf397a76fb1fe3c7b706e0a10a79af731fdc62516ccff5d1722d1319",
+        "upstream/aipoch/biomarker-landscape-scanner/references/conflict-and-inconsistency-rules.md": "f419969cf4427bd625c6413b0823aa1f21d35d66c9998fddde8157d315b2fa1e",
+        "upstream/aipoch/biomarker-landscape-scanner/references/evidence-strength-audit.md": "753d57ed76af31a94dd2e9357ff79cc66c7d5a173eab2c117b53e565d2297c86",
+        "upstream/aipoch/biomarker-landscape-scanner/references/output-section-guidance.md": "a37e0df1dffc0169f13822464839b6065dca868e209e7a619c60a7d91693e7b2",
+        "upstream/aipoch/biomarker-landscape-scanner/references/translation-readiness-rules.md": "b70914ecf6f76d704bb7f5b14aa4df29c4aefd96cfb0c5c6dece3c8f410b1cef",
+        "upstream/aipoch/biomarker-landscape-scanner/references/use-case-framework.md": "03c91dd5da9280fbbfe3e47d4786599d74e9fa1442a8afcfe514dd23b39475c9",
+        "upstream/aipoch/biomarker-landscape-scanner/references/validation-level-framework.md": "f4f596b6fa93a2aa5e39d5cefb2561d2be0e3f14bf07c0889b9ecd9a639fb372"
+      }
+    },
+    {
+      "id": "aipoch/biomedical-search-strategy-builder",
+      "entrypoint": "upstream/aipoch/biomedical-search-strategy-builder/SKILL.md",
+      "repo": "aipoch/medical-research-skills",
+      "commit": "686e09dfdb45d9fa1a08664f06bb93769b3c9d91",
+      "source_path": "awesome-med-research-skills/Evidence Insight/biomedical-search-strategy-builder",
+      "license": "MIT",
+      "files": {
+        "upstream/aipoch/biomedical-search-strategy-builder/SKILL.md": "9f01067112fce398b962f136f7544f5a8f2199cd11f31b664a4540192123bcad",
+        "upstream/aipoch/biomedical-search-strategy-builder/references/boolean-examples.md": "f1b6f8981e7f2b98ef19293af6e4f5fc56c1c893302d97afa928b9513556e414",
+        "upstream/aipoch/biomedical-search-strategy-builder/references/mesh-structure.md": "46c6939ed2b68444a651dda9d1d6b0504f6d50b10f4858358d1f93d09b346696",
+        "upstream/aipoch/biomedical-search-strategy-builder/requirements.txt": "8bc8ec27ebd58686dda2fc8d0b04a46444dfec953351192fcb15fb594149cd3a",
+        "upstream/aipoch/biomedical-search-strategy-builder/scripts/main.py": "dc3c0d1054ca64b585993bcadb5419ebecf846cecec95b1bbfcd1ea10e7beef0"
+      }
+    },
+    {
+      "id": "aipoch/contradictory-findings-resolver",
+      "entrypoint": "upstream/aipoch/contradictory-findings-resolver/SKILL.md",
+      "repo": "aipoch/medical-research-skills",
+      "commit": "686e09dfdb45d9fa1a08664f06bb93769b3c9d91",
+      "source_path": "awesome-med-research-skills/Evidence Insight/contradictory-findings-resolver",
+      "license": "MIT",
+      "files": {
+        "upstream/aipoch/contradictory-findings-resolver/SKILL.md": "77e6abd350a95ca65e4eba5ca80e27c0792a84f8934b84505f2503527e3e8560",
+        "upstream/aipoch/contradictory-findings-resolver/references/conflict-resolution-logic.md": "2f7771994b8eeb4c6eb00146dd269cceb49047069d233cffb5702d39cac6ed77",
+        "upstream/aipoch/contradictory-findings-resolver/references/conflict-type-taxonomy.md": "6d07787e38bfbd0ecba45a932ff66f89dcb8a0d5b561971f55952e63ebc654fe",
+        "upstream/aipoch/contradictory-findings-resolver/references/literature-integrity-rules.md": "ba012e89a0c3958900ad3606fe28dcb70f2e0d4e151863642b76d9d1ec521ada",
+        "upstream/aipoch/contradictory-findings-resolver/references/output-section-guidance.md": "be270d90408b548fd92f8bcb3ada465aa61f9f6e7db263e3f883c40d688812e1",
+        "upstream/aipoch/contradictory-findings-resolver/references/platform-model-and-bias-rules.md": "50a714469cf97e0bbbc177ad1b61741b1d49e9482d95d7b62d3f72adcbbcc1df",
+        "upstream/aipoch/contradictory-findings-resolver/references/population-endpoint-sample-source-rules.md": "28f2f368d9ccba810de0568950b719f6459378981a8931bf09d41ad1f4013902",
+        "upstream/aipoch/contradictory-findings-resolver/references/validation-and-evidence-depth-rules.md": "e29a78aefd2703063c87d5ceae2f979b9f7153395dd8ee15e4caa518f628ef89"
+      }
+    },
+    {
+      "id": "aipoch/disease-mechanism-evidence-map",
+      "entrypoint": "upstream/aipoch/disease-mechanism-evidence-map/SKILL.md",
+      "repo": "aipoch/medical-research-skills",
+      "commit": "686e09dfdb45d9fa1a08664f06bb93769b3c9d91",
+      "source_path": "awesome-med-research-skills/Evidence Insight/disease-mechanism-evidence-map",
+      "license": "MIT",
+      "files": {
+        "upstream/aipoch/disease-mechanism-evidence-map/SKILL.md": "66e1b8492a7794eae43abd5790ebfe0660e5f6aa06b65fe31f3c422ed16a9862",
+        "upstream/aipoch/disease-mechanism-evidence-map/references/cell-tissue-phenotype-link-rules.md": "1b6ab05edd5f1bb37b1e5c1c8f4feb30d6c8b35853335dced786e871ff5983ab",
+        "upstream/aipoch/disease-mechanism-evidence-map/references/direct-vs-indirect-evidence-rules.md": "c3c3e8f3c23eaa6389c0bd230c7eeeec5dac011b3dcbbe00141f99e95998af4c",
+        "upstream/aipoch/disease-mechanism-evidence-map/references/downstream-routing-rules.md": "38c7241f7df9e42cec8968723fbb9d62ae673060e82694fb0bf086c5da300945",
+        "upstream/aipoch/disease-mechanism-evidence-map/references/evidence-strength-and-chain-completeness-rules.md": "f0e6984c7e234dde9df076265206255dbef02733487a35aa6adee18954f25a2b",
+        "upstream/aipoch/disease-mechanism-evidence-map/references/layered-evidence-chain-rules.md": "04572b2f2f12f76d2bca6cd19471c718e643ae36e4041e8e0b2ff4e7983f2cdd",
+        "upstream/aipoch/disease-mechanism-evidence-map/references/literature-verification-and-citation-rules.md": "6d408473037d7f9e3b0716daf172d9cd70cd650a14af588c11d70ecd469c72e4",
+        "upstream/aipoch/disease-mechanism-evidence-map/references/mechanism-axis-identification-rules.md": "872a6220f9e20a58690e79fd8bd750660999c6a4db22c58f6299e72e859de9c0",
+        "upstream/aipoch/disease-mechanism-evidence-map/references/mechanism-hypothesis-entry-rules.md": "af817f060b6a122a1ed15543c2dbc04e6aad7419f0ee39756565ad2e26f01fdd",
+        "upstream/aipoch/disease-mechanism-evidence-map/references/mechanism-scope-rules.md": "8be7297b65c70734595e6599e35d947a58189147d2e25bfc1b19f8f4ce1016f8",
+        "upstream/aipoch/disease-mechanism-evidence-map/references/output-section-guidance.md": "85097de61a6a640bf630ab97e510dc0fea46760433f41b541a0dd24eb1710424",
+        "upstream/aipoch/disease-mechanism-evidence-map/references/workflow-step-template.md": "9c81a2ebb54bb96749c77921aaaea71988981fb04e91fb7b074148b54c875be8"
+      }
+    },
+    {
+      "id": "aipoch/medical-research-gap-finder",
+      "entrypoint": "upstream/aipoch/medical-research-gap-finder/SKILL.md",
+      "repo": "aipoch/medical-research-skills",
+      "commit": "686e09dfdb45d9fa1a08664f06bb93769b3c9d91",
+      "source_path": "awesome-med-research-skills/Evidence Insight/medical-research-gap-finder",
+      "license": "MIT",
+      "files": {
+        "upstream/aipoch/medical-research-gap-finder/SKILL.md": "f468702e8d42a6daf33be5a0411c5b2977e04c4fe2194a213722886bb1fb9f13",
+        "upstream/aipoch/medical-research-gap-finder/references/gap-taxonomy-and-audit-standard.md": "9972fdfe7ebfffe40d19c973bbb49dc8b8ad3d3a8b0534bed813d2ddb18c1850",
+        "upstream/aipoch/medical-research-gap-finder/references/gap-to-study-conversion.md": "fbda153328708d88531d608fc0f5a1b82441ad7d5156182de80985e60af88bef",
+        "upstream/aipoch/medical-research-gap-finder/references/literature-retrieval-and-citation.md": "b9353911f8e0bcc23581c554a54445fdfd9e2dab304d8493a591789ec5cb5576",
+        "upstream/aipoch/medical-research-gap-finder/references/pseudo-gap-rejection-rules.md": "b1b278cf13e657b9177cb7e64c9edf051ee7253b1adc4e7115ed76e9d8f9a051",
+        "upstream/aipoch/medical-research-gap-finder/references/workflow-step-template.md": "78be52160b0fd85a0b999102414d53bc5964bfad48ca92505742ddd2d3f26bac"
+      }
+    },
+    {
+      "id": "aipoch/medical-topic-saturation-and-whitespace-checker",
+      "entrypoint": "upstream/aipoch/medical-topic-saturation-and-whitespace-checker/SKILL.md",
+      "repo": "aipoch/medical-research-skills",
+      "commit": "686e09dfdb45d9fa1a08664f06bb93769b3c9d91",
+      "source_path": "awesome-med-research-skills/Evidence Insight/medical-topic-saturation-and-whitespace-checker",
+      "license": "MIT",
+      "files": {
+        "upstream/aipoch/medical-topic-saturation-and-whitespace-checker/SKILL.md": "8fc48f5fdbb660eafab52b3010dd446e3954c764b46122676087649825f48628",
+        "upstream/aipoch/medical-topic-saturation-and-whitespace-checker/references/differentiation-angle-framework.md": "c39070180b99934af9293a109a5fe1a3227f93adc963673efbb9d0c505e55863",
+        "upstream/aipoch/medical-topic-saturation-and-whitespace-checker/references/evidence-strength-audit.md": "a70c34fc4b95881f098c43e7b16eb30c643cb9d60d41837a17a4f358735fa6a9",
+        "upstream/aipoch/medical-topic-saturation-and-whitespace-checker/references/output-section-guidance.md": "52d378fb6affa6420c8462b08aeac4ad621490006daeb38ca52fa273e678ebde",
+        "upstream/aipoch/medical-topic-saturation-and-whitespace-checker/references/saturation-signal-framework.md": "251e6c7e73b79fe991ef8946bcaed4154001e33bb7a9673259e918c2ebc41d15",
+        "upstream/aipoch/medical-topic-saturation-and-whitespace-checker/references/timing-window-framework.md": "79a162cef9c3f97c9db0682c780c90bb7325be92136b6ae7c6293d077c758a9a",
+        "upstream/aipoch/medical-topic-saturation-and-whitespace-checker/references/topic-unit-framework.md": "e9170ef38c9e59c63e49dc285e09ae3a405893cede3e47540fbdfa37fbd5cff1",
+        "upstream/aipoch/medical-topic-saturation-and-whitespace-checker/references/whitespace-rules.md": "d7ef29b903807bffbca5a08960cecad102edab9a6723b8e046ebca3a923c6487"
+      }
+    },
+    {
+      "id": "aipoch/method-gap-detector",
+      "entrypoint": "upstream/aipoch/method-gap-detector/SKILL.md",
+      "repo": "aipoch/medical-research-skills",
+      "commit": "686e09dfdb45d9fa1a08664f06bb93769b3c9d91",
+      "source_path": "awesome-med-research-skills/Evidence Insight/method-gap-detector",
+      "license": "MIT",
+      "files": {
+        "upstream/aipoch/method-gap-detector/SKILL.md": "d1339d5d2edbf30445dca648b54289f0947d92d464b69a3c1eecd9c75154710d",
+        "upstream/aipoch/method-gap-detector/references/analysis-rigor-rules.md": "5432c223270c70ea72608edeab274b96a8f19f1e57d3afb435aaa00d27fb3903",
+        "upstream/aipoch/method-gap-detector/references/design-and-bias-control-rules.md": "4fef6ac4ba72052a6d8aa978416dc19568efc22ff37df9769b957e380cb3f37b",
+        "upstream/aipoch/method-gap-detector/references/method-gap-taxonomy.md": "9c2e9fc5eaa4bcef9a427e3c4aa10f9370f013225d6baaca2bb066e7dee77659",
+        "upstream/aipoch/method-gap-detector/references/output-section-guidance.md": "33dc05d3c2b3bc54cdf8db53775fe32bf2462c7ef4bb585024bd9c2550f665a9",
+        "upstream/aipoch/method-gap-detector/references/reproducibility-and-reporting-rules.md": "423df0ceb64c741908bd13e149808561f3d80cc9f03cb976643a5a0ad74f26a2",
+        "upstream/aipoch/method-gap-detector/references/upgrade-priority-rules.md": "cd07c7485dfaf4864c0b58616e6bfed4f6428a0dc5c7c7df7104fbcfb38bc9e6",
+        "upstream/aipoch/method-gap-detector/references/validation-depth-framework.md": "f495a6edeca660910be164ca5a4acf31ba9babd94cd09b7b2898796f214dc72d"
+      }
+    },
+    {
+      "id": "aipoch/paper-to-claim-verifier",
+      "entrypoint": "upstream/aipoch/paper-to-claim-verifier/SKILL.md",
+      "repo": "aipoch/medical-research-skills",
+      "commit": "686e09dfdb45d9fa1a08664f06bb93769b3c9d91",
+      "source_path": "awesome-med-research-skills/Evidence Insight/paper-to-claim-verifier",
+      "license": "MIT",
+      "files": {
+        "upstream/aipoch/paper-to-claim-verifier/SKILL.md": "85393ab27d38f4977477145dc581bda9c2eb6e2c0ed6d9245ab0e3f421634e9c",
+        "upstream/aipoch/paper-to-claim-verifier/references/causality-boundary-rules.md": "3bf52db7bfb258944b678a9d64ab3c72f88507d1bf42c0a45b0967f70250d6cd",
+        "upstream/aipoch/paper-to-claim-verifier/references/citation-drift-taxonomy.md": "76eab2d22aef363abb8c8b1878ccc173a02f9616cdd2924db881620e673e5f16",
+        "upstream/aipoch/paper-to-claim-verifier/references/claim-decomposition-rules.md": "63233773bce09ae235965ffa507c314940fc906bf3094367e6029514e141bdfe",
+        "upstream/aipoch/paper-to-claim-verifier/references/context-transfer-rules.md": "9d26e0eef51850721ed58d1446bb993d1ff526d7c0c7a3e3874ea0313cc8ca01",
+        "upstream/aipoch/paper-to-claim-verifier/references/evidence-support-judgment-rules.md": "265488a60e8a9b44d3825bfdda0041523a631c98cbe35a618deee08315755c5f",
+        "upstream/aipoch/paper-to-claim-verifier/references/literature-integrity-rules.md": "9dc1e899d60329febb32475a13a22e3d7f8d142895b098ecbfdbe748e273721c",
+        "upstream/aipoch/paper-to-claim-verifier/references/output-section-guidance.md": "0389f75bc172c2689504321f7f1efcd99c592a89341421f56043bc15d5d27b04",
+        "upstream/aipoch/paper-to-claim-verifier/references/source-tracing-rules.md": "457ac8b82931ffee719028099e7720032f1f82cd61e8e74dec89b49d5f61b941",
+        "upstream/aipoch/paper-to-claim-verifier/references/workflow-step-template.md": "c9eb7e3ef62f976431aa2135faad2c1e33e6bec1e6a3f5f7e4f7a7bce93d62ac"
+      }
+    },
+    {
+      "id": "kdense/literature-review",
+      "entrypoint": "upstream/kdense/literature-review/SKILL.md",
+      "repo": "K-Dense-AI/scientific-agent-skills",
+      "commit": "a1043ef544e3a100c28e70a736b6cf32554d0677",
+      "source_path": "skills/literature-review",
+      "license": "MIT",
+      "files": {
+        "upstream/kdense/literature-review/SKILL.md": "16a9e85bcdcb9bb859e1646bf836e51b22900445ba2e367d8d75be05b5a5cba8",
+        "upstream/kdense/literature-review/assets/review_template.md": "08671516976d01a7004f8ae7c944a50c253877504720c15d5fa24eed90889819",
+        "upstream/kdense/literature-review/references/citation_styles.md": "2a50e43b18c2fff781e04406deb66186ba8f91ed28af32004aba63c63dcc1789",
+        "upstream/kdense/literature-review/references/core_workflow.md": "4d63f1087c98efeec7c7bf622bed6e0456a9c7c3defe584995917f2de6f2c601",
+        "upstream/kdense/literature-review/references/database_strategies.md": "24b56cd88128a9016520ed6b5e2abb79e19dc9b86cbf064927e9056aa1504f48",
+        "upstream/kdense/literature-review/references/example_workflow.md": "86336c42f78ff282430a6cdd2282a99562cc9d5e46b62e70a33bd839f9ab726a",
+        "upstream/kdense/literature-review/references/search_and_citation.md": "f33d671351989ee86066b9a21bdbf630a1f60001ada92fda4c942006d37b74fe",
+        "upstream/kdense/literature-review/scripts/generate_pdf.py": "0ba1b16b196b64d4966e5f055a289f0c17e3579a84254abe47ff63be95b4f136",
+        "upstream/kdense/literature-review/scripts/generate_schematic.py": "0c81ce099d5ab9aa3d3c486aa9bd3e81ee1117e18a54db14bb0a68de61eaa4bc",
+        "upstream/kdense/literature-review/scripts/generate_schematic_ai.py": "7316f2df92f442b8c60a5dd2bd8b504e17449d4be89352e5af24be2239700046",
+        "upstream/kdense/literature-review/scripts/search_databases.py": "76f47fd18ca28df4985ffc6d30d5ad659e67c8058bb3de8f385c2443752f4eaf",
+        "upstream/kdense/literature-review/scripts/verify_citations.py": "4c8e8377718ddd47e9cd7cef706935b04910af5d13bfd920970dcf41d4ef3706"
+      }
+    }
+  ],
+  "licenses": {
+    "upstream/aipoch/LICENSE": "92cd32f3b4857f97a3ad6bf276c42dea2e93fd2bb714b08d75a558c9f215f596",
+    "upstream/kdense/LICENSE.md": "09b02a3c9df3053c55531d503357a9c7cde275970e6c3ceaa1ddf5f0e90b40c1"
+  }
+}

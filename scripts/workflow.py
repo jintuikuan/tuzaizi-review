@@ -13,6 +13,7 @@ import uuid
 from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
+from orchestration import phase_errors
 
 
 STATUSES = {"initialized", "retrieved", "awaiting_selection", "selected", "draft_ready", "complete"}
@@ -493,6 +494,8 @@ def validate_run(run_dir: str | Path, final: bool = False) -> dict:
     gene_terms = [term for term in (gene.get("symbol"), gene.get("official_symbol"), parameters.get("gene")) if _present(term)]
     for gap in gaps.values():
         _gap_check(gap, evidence, papers, searches, gene_terms, errors)
+        if state.get("orchestration") and gap.get("confidence") == "low":
+            errors.append(f"{gap.get('gap_id')}: low-confidence leads belong in the exploratory report, not selectable gaps.json")
     if state.get("status") in {"awaiting_selection", "selected", "draft_ready", "complete"} or final:
         _core_retrieval_check(run_dir, state, errors)
         if not evidence:
@@ -505,6 +508,8 @@ def validate_run(run_dir: str | Path, final: bool = False) -> dict:
                 errors.append(f"Missing nonempty {name}")
     if final:
         _validate_final(run_dir, state, papers, evidence, gaps, errors, warnings)
+    if final or state.get("status") in {"awaiting_selection", "selected", "draft_ready", "complete"}:
+        errors.extend(phase_errors(run_dir, final=final))
     return {"ok": not errors, "errors": errors, "warnings": warnings}
 
 
@@ -515,6 +520,7 @@ def prepare_selection(run_dir: str | Path) -> dict:
         raise ValueError("Selection preparation is only allowed before a gap has been selected")
     report = validate_run(run_dir)
     errors = list(report["errors"])
+    errors.extend(phase_errors(run_dir))
     _core_retrieval_check(run_dir, state, errors)
     for name in ("papers.jsonl", "evidence.jsonl", "gaps.json", "gap_searches.jsonl", "landscape.md", "gaps.md"):
         path = run_dir / name

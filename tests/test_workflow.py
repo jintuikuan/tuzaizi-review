@@ -11,6 +11,7 @@ from unittest import mock
 SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 import workflow as w
+from orchestration import enable as enable_skills
 
 
 class WorkflowTest(unittest.TestCase):
@@ -85,6 +86,24 @@ class WorkflowTest(unittest.TestCase):
             w.update_run(self.root, selected_gap_id="G1")
         with self.assertRaises(ValueError):
             w.update_run(self.root, status="complete")
+
+    def test_valid_evidence_cannot_bypass_upstream_checkpoint(self):
+        self.gap["confidence"] = "medium"
+        self.save_inputs()
+        enable_skills(self.root)
+        with self.assertRaisesRegex(ValueError, "missing mandatory upstream invocation"):
+            w.prepare_selection(self.root)
+        self.assertNotEqual(w.load_run(self.root)["status"], "awaiting_selection")
+
+    def test_final_export_requires_upstream_execution_as_well_as_evidence(self):
+        self.select()
+        self.draft()
+        w.update_run(self.root, orchestration={"version": 1})
+        report = w.validate_run(self.root, final=True)
+        self.assertFalse(report["ok"])
+        self.assertTrue(any("mandatory upstream invocation" in e for e in report["errors"]))
+        with self.assertRaisesRegex(ValueError, "export refused"):
+            w.export_review(self.root, docx=False)
 
     def test_jsonl_round_trip_preserves_unicode_line_separators_in_strings(self):
         rows = [{"paper_id": "P1", "abstract": "Line\u2028separator\u2029paragraph\u0085next"},

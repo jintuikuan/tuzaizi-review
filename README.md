@@ -1,61 +1,61 @@
 # tuzaizi-review
 
-面向 Codex 的基因调研与综述总控技能。输入“基因 + 时间窗 + 疾病或机制”，依次执行真实文献检索、证据全景整理、创新点反查，等用户选择方向后撰写并核验综述。
+输入“基因 + 时间窗 + 疾病/机制”，由总控**实际调度两套上游子技能**：先用 AIpoch 形成检索策略、证据全景与候选方向，**暂停等你选题**；选定后调用 K-Dense `literature-review` 生成英文机制叙述性综述，再调用 AIpoch 论断核验。
 
-## 安装与调用
-
-将本仓库的完整目录安装到 `~/.codex/Skills/tuzaizi-review/`，确保该目录下直接包含 `SKILL.md`：
+## 安装
 
 ```bash
 git clone git@github.com:jintuikuan/tuzaizi-review.git \
   "$HOME/.codex/Skills/tuzaizi-review"
 ```
 
-在能发现该技能的新 Codex 对话中输入：
+仓库已包含所需的9个上游技能及支持资源、固定版本、SHA256与MIT许可，无须再安装整个上游仓库。安装后下一轮对话可发现技能。
+
+## 两轮调用
+
+第一轮：
 
 ```text
-$tuzaizi-review 帮我调研近5年 METTL3 在肿瘤免疫逃逸中的研究，梳理方向并提出有证据支持的创新点。
+$tuzaizi-review 调研近5年 METTL3 在肿瘤免疫逃逸中的研究。调用上游技能完成检索策略、研究全景和有文献依据的创新点；交付候选方向后暂停，等我选择。
 ```
 
-默认先交付中文研究全景和创新点说明，进入 `awaiting_selection` 后**必须停止并等待用户选题**。收到“继续，选第 2 个方向”等明确选择后，才撰写 4,000–6,000 词的英文机制导向叙述性综述，导出 Markdown、可编辑 Word、参考文献和证据表。
+第二轮，在同一研究对话中：
 
-“近五年”按检索日向前滚动五年；明确的 `2021–2026` 则从 2021-01-01 起算，截止检索日或 2026-12-31 中较早者。日期按 UTC+08 计算。默认解析人类基因名称，同时保留相关动物模型研究。
-
-## 依赖与执行方式
-
-- Python 3.10+；核心脚本仅使用标准库和公开 API，无需付费 API。实时检索需要网络。
-- Word 导出额外需要 `python-docx`，可使用宿主已有的文档运行环境；也可在自行管理的虚拟环境安装 `python-docx`。
-- 当前智能体负责阅读、筛选、证据提取、创新判断和写作；CLI 负责检索、去重、核验、状态管理和导出，单独运行检索命令不会自动生成综述。
-- 数据来源为 NCBI Gene、PubMed、Europe PMC，必要时使用 Ensembl；通过 Europe PMC 发现预印本，再用 bioRxiv DOI 接口补充版本信息。
-
-实际 CLI 示例：
-
-```bash
-SKILL="$HOME/.codex/Skills/tuzaizi-review"
-RUN="$PWD/work/mettl3-immune-review"
-
-python3 "$SKILL/scripts/research.py" init --run-dir "$RUN" \
-  --gene METTL3 --topic 'tumor immune escape' --last-years 5 \
-  --concept 'immune escape|immune evasion|immunosuppression|checkpoint|PD-L1' \
-  --concept 'cancer|tumor|tumour|neoplasm'
-python3 "$SKILL/scripts/research.py" search --run-dir "$RUN" --enrich-preprints
-python3 "$SKILL/scripts/research.py" status --run-dir "$RUN"
+```text
+继续，选第2个方向。复用前面的文献与证据，调用 literature-review，生成英文综述并导出 Markdown 和 Word。
 ```
 
-`--concept` 组内用 `|` 表示 OR，多组之间为 AND。正式调研应完成全部分页；`--limit` 只用于独立运行中的连通性测试。分析文件、反查、选题恢复及导出命令见[执行与文件契约](references/workflow-contract.md)，参数以 `research.py --help` 和各子命令的 `--help` 为准。
+如果换了对话，附上之前的运行目录 `RUN`，总控先读取其状态再继续。默认中文调研报告、英文综述正文 4,000–6,000 词；篇幅、基因和主题可覆盖；当前终稿字数校验面向默认英文综述。“近五年”滚动回溯，明确年份范围则从首年年初至运行日/末年年末中较早者，不包含未来。
 
-## 质量与测试
+## 实际执行链
 
-证据记录区分题录、摘要和全文，分开核验文献身份与论断支持度。候选创新点必须有最近邻比较和针对性反查；不把零命中等同于全球首次，也不使用模拟新颖度评分。完整分页不代表系统综述或穷尽检索。
+| 阶段 | 上游子技能 | 完成后 |
+|---|---|---|
+| search | AIpoch biomedical-search-strategy-builder | 公共API按策略检索 |
+| landscape | AIpoch disease-mechanism-evidence-map、biomarker-landscape-scanner | 中文证据全景 |
+| gaps | AIpoch medical-research-gap-finder、medical-topic-saturation-and-whitespace-checker、contradictory-findings-resolver、method-gap-detector | 候选方向及反查依据 |
+| awaiting_selection | **停止，等用户选择** | 不能提前写完整综述 |
+| review | K-Dense literature-review | 围绕选中方向的英文综述 |
+| claims | AIpoch paper-to-claim-verifier | 论断支持检查与修订 |
 
-在仓库根目录执行离线测试：
+每阶段 `skills begin` 输出真实上游规程与任务，代理实际按其工作后写应用说明，`skills finish` 才登记完成。仅下载、打印或加载技能不能通过选题/终稿门槛。日志是代理执行声明，不能替代独立的证据判断；文献身份和论断支持仍分别核验。
+
+## 依赖与范围
+
+Python 3.10+，核心调度/检索只用标准库；Word 导出需 `python-docx`。核心检索使用免费 NCBI Gene、PubMed、Europe PMC、Ensembl及bioRxiv版本接口。Parallel/OpenRouter、付费画图、PDF工具链不默认启用。
+
+AIpoch 原规程要求的 Google Scholar/WoS 若不可用，会在覆盖说明和应用记录中写明，而不会声称已检索。方法适配、不可用来源、标志物适用模式、低置信线索及归因规则见[调度契约](references/upstream-routing.md)。上游原文未改，当前交付为机制叙述性综述草稿，不自动宣称系统综述或满足投稿标准。
+
+CLI 与证据格式见[文件契约](references/workflow-contract.md)。关键参数：
 
 ```bash
+python3 scripts/research.py --help
+python3 scripts/research.py skills --help
 python3 -m unittest discover -s tests -v
 ```
 
-Word 导出测试在安装 `python-docx` 的环境运行。真实调研的缓存、全文、研究状态和输出请放到 `work/`、`runs/` 或 `outputs/`，不提交到仓库。
+新运行自动启用上游调度。旧运行不会被追认为已调用：仅选题前可用 `skills enable`，再实际执行前置阶段；旧运行已选题/完成时新建编排运行并复用语料。
 
-## 来源与许可说明
+## 来源与许可
 
-本技能独立实现，方法组织参考 [aipoch/medical-research-skills](https://github.com/aipoch/medical-research-skills) 与 [K-Dense-AI/scientific-agent-skills](https://github.com/K-Dense-AI/scientific-agent-skills)，未捆绑上游程序代码。固定版本、能力边界及适用的上游 MIT 声明见[来源与复用说明](references/sources-and-reuse.md)和 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)；上游声明不等于为本仓库原创代码或论文全文重新授予许可。
+上游来源为 [aipoch/medical-research-skills](https://github.com/aipoch/medical-research-skills) 和 [K-Dense-AI/scientific-agent-skills](https://github.com/K-Dense-AI/scientific-agent-skills)。固定提交、文件哈希和原始路径见 `upstream/manifest.json`，MIT声明见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) 与上游许可文件。许可不包括检索到的论文全文；语料、全文和生成报告请放 `work/`、`runs/` 或 `outputs/`，不要提交私有研究资料。

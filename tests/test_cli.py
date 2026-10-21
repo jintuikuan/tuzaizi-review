@@ -11,10 +11,54 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from research import date_window, parser
 from research import verify_command
 from research import fulltext_command
-from workflow import create_run, write_jsonl
+from research import init_command, set_queries_command, search_command
+from workflow import create_run, write_jsonl, load_run, update_run
 
 
 class DateAndInterfaceTests(unittest.TestCase):
+    def test_new_cli_run_enables_upstream_orchestration_without_selecting(self):
+        with tempfile.TemporaryDirectory() as d:
+            args = parser().parse_args(["init", "--run-dir", d, "--gene", "METTL3",
+                                        "--topic", "immune escape", "--concept", "immune escape"])
+            with patch("research.resolve_gene", return_value={"symbol": "METTL3", "aliases": []}):
+                init_command(args)
+            state = load_run(d)
+            self.assertEqual(state["orchestration"]["version"], 1)
+            self.assertEqual(state["status"], "initialized")
+            self.assertIsNone(state["selected_gap_id"])
+
+    def test_exact_upstream_queries_are_saved_before_retrieval_only(self):
+        with tempfile.TemporaryDirectory() as d:
+            create_run(d, {"gene": "METTL3"}, {"symbol": "METTL3"})
+            args = parser().parse_args(["set-queries", "--run-dir", d,
+                                        "--pubmed-query", "METTL3[Title/Abstract]",
+                                        "--europepmc-query", "TITLE_ABS:METTL3"])
+            set_queries_command(args)
+            self.assertEqual(load_run(d)["query_plan"]["pubmed"], args.pubmed_query)
+            update_run(d, status="retrieved")
+            with self.assertRaisesRegex(ValueError, "before retrieval"):
+                set_queries_command(args)
+
+    def test_failed_bundle_init_does_not_leave_a_legacy_bypass(self):
+        with tempfile.TemporaryDirectory() as d:
+            args = parser().parse_args(["init", "--run-dir", d, "--gene", "METTL3",
+                                        "--topic", "immune escape", "--concept", "immune escape"])
+            with patch("research.resolve_gene", return_value={"symbol": "METTL3", "aliases": []}), \
+                 patch("research.enable_skills", side_effect=ValueError("bundle unavailable")):
+                with self.assertRaisesRegex(ValueError, "bundle unavailable"):
+                    init_command(args)
+            self.assertEqual(load_run(d)["orchestration"]["version"], 1)
+
+    def test_retrieval_cannot_precede_actual_upstream_search_completion(self):
+        with tempfile.TemporaryDirectory() as d:
+            create_run(d, {"gene": "METTL3"}, {"symbol": "METTL3"})
+            update_run(d, orchestration={"version": 1})
+            args = parser().parse_args(["search", "--run-dir", d])
+            with patch("research._do_search") as retrieve:
+                with self.assertRaisesRegex(ValueError, "before retrieval"):
+                    search_command(args)
+            retrieve.assert_not_called()
+
     def test_rolling_five_years_is_not_six_calendar_years(self):
         with patch("research.today", return_value=dt.date(2026, 10, 19)):
             w = date_window(last_years=5)
